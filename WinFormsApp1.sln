@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "购物管理系统", "WinFormsApp1\购物管理系统.csproj", "{4A95AFF5-1D44-44B8-B965-31B553109287}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4A95AFF5-1D44-44B8-B965-31B553109287}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A95AFF5-1D44-44B8-B965-31B553109287}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A95AFF5-1D44-44B8-B965-31B553109287}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A95AFF5-1D44-44B8-B965-31B553109287}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {435790F0-5D1A-4854-9E08-240E247EF3D6}
+	EndGlobalSection
+EndGlobal
