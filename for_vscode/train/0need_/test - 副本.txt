@@ -1,0 +1,199 @@
+#pragma optomize(3)
+#pragma optimize("Ofast")
+#include <bits/stdc++.h>
+using namespace std;
+#define int long long
+
+class segtree {
+public:
+    struct node {
+        int idx = 0;
+        int val = 0;
+        void apply(int l, int r, int v) {
+            idx = l;
+            val += v;
+        }
+    };
+    node unite(const node& a, const node& b) const {
+        node res;
+        if(a.val == b.val)
+        {
+            if(a.idx < b.idx) res = a;
+            else res = b;
+        }
+        else if(a.val < b.val) res = a;
+        else if(a.val > b.val) res = b;
+        return res;
+    }
+    inline void push(int x, int l, int r) {
+        // int y = (l + r) >> 1;
+        // int z = x + ((y - l + 1) << 1);
+        // if (tree[x].add != 0) {
+        //     tree[x + 1].apply(l, y, tree[x].add);
+        //     tree[z].apply(y + 1, r, tree[x].add);
+        //     tree[x].add = 0;
+        // }
+    }
+    inline void pulL(int x, int z) {
+        tree[x] = unite(tree[x + 1], tree[z]);
+    }
+    int n;
+    vector<node> tree;
+    void build(int x, int l, int r) {
+        if (l == r) {
+            return;
+        }
+        int y = (l + r) >> 1;
+        int z = x + ((y - l + 1) << 1);
+        build(x + 1, l, y);
+        build(z, y + 1, r);
+        pulL(x, z);
+    }
+    template <typename M>
+    void build(int x, int l, int r, const vector<M>& v) {
+        if (l == r) {
+            tree[x].apply(l, r, v[l]);
+            return;
+        }
+        int y = (l + r) >> 1;
+        int z = x + ((y - l + 1) << 1);
+        build(x + 1, l, y, v);
+        build(z, y + 1, r, v);
+        pulL(x, z);
+    }
+    node get(int x, int l, int r, int lL, int rr) {
+        if (lL <= l && r <= rr) {
+            return tree[x];
+        }
+        int y = (l + r) >> 1;
+        int z = x + ((y - l + 1) << 1);
+        push(x, l, r);
+        node res{};
+        if (rr <= y) {
+            res = get(x + 1, l, y, lL, rr);
+        }
+        else {
+            if (lL > y) {
+                res = get(z, y + 1, r, lL, rr);
+            }
+            else {
+                res = unite(get(x + 1, l, y, lL, rr), get(z, y + 1, r, lL, rr));
+            }
+        }
+        pulL(x, z);
+        return res;
+    }
+    template <typename... M>
+    void modify(int x, int l, int r, int lL, int rr, const M&... v) {
+        if (lL <= l && r <= rr) {
+            tree[x].apply(l, r, v...);
+            return;
+        }
+        int y = (l + r) >> 1;
+        int z = x + ((y - l + 1) << 1);
+        push(x, l, r);
+        if (lL <= y) {
+            modify(x + 1, l, y, lL, rr, v...);
+        }
+        if (rr > y) {
+            modify(z, y + 1, r, lL, rr, v...);
+        }
+        pulL(x, z);
+    }
+    segtree(int _n) : n(_n) {
+        assert(n > 0);
+        tree.resize(2 * n - 1);
+        build(0, 0, n - 1);
+    }
+    template <typename M>
+    segtree(const vector<M>& v) {
+        n = v.size();
+        assert(n > 0);
+        tree.resize(2 * n - 1);
+        build(0, 0, n - 1, v);
+    }
+    node get(int lL, int rr) {
+        assert(0 <= lL && lL <= rr && rr <= n - 1);
+        return get(0, 0, n - 1, lL, rr);
+    }
+    template <typename... M>
+    void modify(int lL, int rr, const M&... v) {
+        assert(0 <= lL && lL <= rr && rr <= n - 1);
+        modify(0, 0, n - 1, lL, rr, v...);
+    }
+};
+
+
+void solve()
+{
+
+    int n , m  , lasttime =0 ;
+    cin >> n >> m;
+    vector<int> sz(m);
+    vector<int> tt(m);
+    deque<pair<int,int>> window[m];
+    vector<pair<int,int>> visitors(n);
+    for(auto&x: visitors)
+    {
+        cin >> x.first >> x.second;
+    }
+    sort(visitors.begin() , visitors.end() );
+    segtree st(sz);
+    for(auto x:visitors)
+    {
+        for(int i=0 ; i<m ; ++i)
+        {    
+            tt[i] += (x.first - lasttime);
+            if(window[i].empty()) tt[i] =  0;
+            int cnt = 0;
+            while( !window[i].empty() && tt[i] >= window[i].front().second)
+            {
+                tt[i] -= window[i].front().second;
+                window[i].pop_front();
+                ++cnt;
+            }
+            if(cnt) st.modify(i , i , -cnt);
+        }
+
+        int pos = st.get(0 , m - 1).idx;
+        window[pos].push_back(x);
+        st.modify(pos , pos , 1);
+        
+        lasttime = x.first;
+    }
+
+    int time = visitors.back().first;
+    int maxtime = 0;
+
+
+    for(int i=0 ; i<m ; ++i)
+    {
+        int t = 0;
+        while(!window[i].empty())
+        {
+            t += window[i].front().second;
+            window[i].pop_front();
+        }
+        t -= tt[i];
+        maxtime = max(maxtime , t);
+    }
+
+    cout << time + maxtime << "\n";
+
+}
+signed main()
+{
+    #ifdef __LOCAL
+
+    freopen("usrin.txt" , "r"  ,stdin);
+    freopen("usrout.txt" , "w" , stdout);
+    
+    #endif
+    ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+    int __T = 1;
+    cin >> __T;
+    while (__T--)
+    {
+        solve();
+    }
+}
